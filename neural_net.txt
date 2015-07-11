@@ -1,0 +1,79 @@
+from model import Value, Brain
+type Weight
+
+class Network(Brain)
+    var:Layer[] layers
+
+    func constructor(Layer[] layers)
+        self.layers = layers
+
+    func setInput(Value[] inputs) returns Null
+        for input, input_node in zip(inputs, self.layers[0].nodes):
+            input_node.setInput(input)
+
+    func process(Value[] input) returns Value[]
+        self.setInput(input)
+        for layer in self.layers[1:]:
+            layer.propagate()
+        return self.layers[-1].getValues()
+
+class Layer
+    var:Node[] nodes
+    var:func transfer(Value) returns Value
+
+    func constructor()
+        self.nodes = []
+        self.transfer = Null
+
+    func propagate() returns Null
+        for node in self.nodes:
+            node.propagate()
+
+    func getValues() returns Value[]
+        return [node.outValue for node in self.nodes]
+
+class Node
+    var:Edge[] outEdges
+    var:Edge[] inEdges
+    var:Value inValue
+    var:Value outValue
+    var:Layer layer
+
+    func constructor(Node[] inNodes, Node[] outNodes, Layer layer)
+        self.inValue = Null
+        self.outValue = Null
+
+        self.outEdges = []
+        for outNode in outNodes:
+            self.outEdges.append(Edge(outNode, self))
+
+        self.inEdges = []
+        for inNode in inNodes:
+            self.inEdges.append(Edge(self, outNode))
+
+        self.layer = layer
+
+        if self not in self.layer.nodes:
+            later.nodes.append(self)
+
+    func setInput(Value value)
+        self.inValue = value
+
+    func propagate() returns Null
+        self.inValue = <Value> 0
+        for inEdge in node.inEdges:
+            self.inValue += inEdge.propagate()
+        self.outValue = self.layer.transfer(inValue)
+
+class Edge
+    var:Weight weight
+    var:Node inNode
+    var:Node outNode
+
+    func constructor(Node inNode, Node outNode, Weight weight)
+        self.inNode = inNode
+        self.outNode = outNode
+        self.weight = weight
+
+    func propagate() returns Value
+        return self.weight * self.inNode.outValue

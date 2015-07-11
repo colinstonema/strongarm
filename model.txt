@@ -1,0 +1,41 @@
+type Value
+type Location
+
+func view_environment(Location location) returns Value[]
+
+func initialise_location() returns Location
+
+func initialise_brain() returns Brain
+
+class Brain
+    abstract func process(Value[] input) returns Value[]
+
+class Legs
+    var:Location location
+
+    func constructor(Location location)
+        self.location = location
+
+    func move(Value[] instructions) returns Location
+
+class Body
+    var:Brain brain
+    var:Legs legs
+
+    func constructor(Location location, Brain brain)
+        self.brain = brain
+        self.legs = Legs(location)
+
+    func respond(Value[] input) returns Location
+        var:Value[] output = brain.process(input)
+        location = legs.move(output)
+        return location
+
+func main()
+    var:Location location = initialise_location()
+    var:Brain brain = initialise_brain()
+    var:Body body = Body(location, brain)
+
+    while True:
+        var:Value[] input = view_environment(location)
+        location = body.respond(input)
